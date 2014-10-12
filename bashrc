@@ -19,6 +19,9 @@ bind 'set completion-ignore-case on'
 set -o vi
 complete -cf sudo
 
+bind '"\e[A": history-search-backward'
+bind '"\e[B": history-search-forward'
+
 # ls
 alias ls='ls -hF --color=auto'
 alias lr='ls -R'                    # recursive ls
