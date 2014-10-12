@@ -1,4 +1,4 @@
-set nocompatible        " Must be first line
+set nocompatible
 set shell=/bin/bash\ -i
 
 
@@ -41,7 +41,8 @@ Plug 'tpope/vim-haml'
 Plug 'fatih/vim-go'
 Plug 'tpope/vim-markdown'
 Plug 'vim-scripts/restore_view.vim'
-Plug 'mhinz/vim-blockify'
+Plug 'mhinz/vim-signify'
+Plug 'maxbrunsfeld/vim-yankstack'
 
 call plug#end()
 
@@ -56,7 +57,7 @@ scriptencoding utf-8
 set nospell
 set clipboard=
 
-autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s
+autocmd FileType c,cpp,cs,java,go setlocal commentstring=//\ %s
 
 set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
 set virtualedit=onemore                         " Allow for cursor beyond last character
@@ -71,7 +72,10 @@ set undofile         " So is persistent undo ...
 set undolevels=1000  " Maximum number of changes that can be undone
 set undoreload=10000 " Maximum number lines to save for undo on a buffer reload
 
+" swapfile macht ggf. probleme mit tools, die verzeichnisse/dateien ueberwachen.
+" set noswapfile
 set directory=~/.vimswap
+
 set backupdir=~/.vimbackup
 set viewdir=~/.vimviews
 set undodir=~/.vimundo
@@ -80,28 +84,16 @@ set undodir=~/.vimundo
 " Vim UI
 set guifont=Inconsolata\ 11
 colorscheme base16-default
-set background=dark           " Assume a dark background
+set background=dark                            " Assume a dark background
 
-set visualbell                " kein beep...
-autocmd! GUIEnter * set t_vb= " keine visualbell (screen flashing)
+set visualbell                                 " kein beep...
+autocmd! GUIEnter * set t_vb=                  " keine visualbell (screen flashing)
 
-set showmode                  " Display the current mode
-set cursorline                " Highlight current line
-
-set shortmess+=filmnrxoOtTI   " Abbrev. of messages (avoids 'hit enter')
-
-set ruler                                          " Show the ruler
-set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%) " A ruler on steroids
-set showcmd                                        " Show partial commands in status line and
-
+set cursorline                                 " Highlight current line
+set shortmess+=filmnrxoOtTI                    " Abbrev. of messages (avoids 'hit enter')
+set diffopt+=vertical
+set showcmd                                    " Show partial commands in status line and
 set laststatus=2
-set statusline=%<%f\                     " Filename
-set statusline+=%w%h%m%r                 " Options
-set statusline+=%{fugitive#statusline()} " Git Hotness
-set statusline+=\ [%{&ff}/%Y]            " Filetype
-set statusline+=\ [%{getcwd()}]          " Current dir
-set statusline+=%=%-14.(%l,%c%V%)\ %p%%  " Right aligned file nav info
-
 set backspace=indent,eol,start                 " Backspace for dummies
 set number
 set relativenumber
@@ -131,11 +123,12 @@ set softtabstop=4 " Let backspace delete indent
 set nojoinspaces  " Prevents inserting two spaces after punctuation on a join (J)
 set splitright    " Puts new vsplit windows to the right of the current
 set splitbelow    " Puts new split windows to the bottom of the current
+set textwidth=120
+set formatoptions-=t
 
 
 " Key Mappings
 
-" let mapleader = ','
 let mapleader = "\<Space>"
 
 inoremap jk <Esc>
@@ -152,7 +145,7 @@ nmap <silent> <leader>bb :e ~/.bashrc<CR>
 nnoremap <silent> <Leader>w :w<CR>
 nnoremap <silent> <Leader>x :bd<CR>
 nnoremap <silent> <Leader>q :q<CR>
-nnoremap <silent> <Leader>k :b#<CR>
+nnoremap <silent> <Tab> :b#<CR>
 nnoremap <silent> <Leader>h :bp<CR>
 nnoremap <silent> <Leader>l :bn<CR>
 
@@ -233,7 +226,8 @@ map zh zH
 
 let b:match_ignorecase = 1
 let g:syntastic_always_populate_loc_list = 1
-nnoremap <leader>a :Ack! 
+nnoremap <leader>a :Ack 
+let g:ackprg = '/bin/ag -S --nogroup --nocolor --column'
 " bufferline nicht noch separat von airline darstellen
 let g:bufferline_echo = 0
 
@@ -293,30 +287,8 @@ let NERDTreeKeepTreeInNewTab=1
 let g:nerdtree_tabs_open_on_gui_startup=0
 
 
-" Plugins: Tabularize
-nmap <Leader>a& :Tabularize /&<CR>
-vmap <Leader>a& :Tabularize /&<CR>
-nmap <Leader>a= :Tabularize /=<CR>
-vmap <Leader>a= :Tabularize /=<CR>
-nmap <Leader>a=> :Tabularize /=><CR>
-vmap <Leader>a=> :Tabularize /=><CR>
-nmap <Leader>a: :Tabularize /:<CR>
-vmap <Leader>a: :Tabularize /:<CR>
-nmap <Leader>a:: :Tabularize /:\zs<CR>
-vmap <Leader>a:: :Tabularize /:\zs<CR>
-nmap <Leader>a, :Tabularize /,<CR>
-vmap <Leader>a, :Tabularize /,<CR>
-nmap <Leader>a,, :Tabularize /,\zs<CR>
-vmap <Leader>a,, :Tabularize /,\zs<CR>
-nmap <Leader>a<Bar> :Tabularize /<Bar><CR>
-vmap <Leader>a<Bar> :Tabularize /<Bar><CR>
-
-
 " Plugins: Session List
 set sessionoptions=blank,buffers,curdir,folds,tabpages,winsize
-nmap <leader>sl :SessionList<CR>
-nmap <leader>ss :SessionSave<CR>
-nmap <leader>sc :SessionClose<CR>
 
 
 " Plugins: JSON
@@ -324,9 +296,7 @@ let g:vim_json_syntax_conceal = 0
 
 
 " Plugins: CtrlP
-
-" nnoremap <silent> <Leader>. :CtrlPBuffer<CR>
-nnoremap <silent> <Leader>j :CtrlPBuffer<CR>
+nnoremap <silent> <Leader><Tab> :CtrlPBuffer<CR>
 
 " let g:ctrlp_by_filename = 1
 let g:ctrlp_working_path_mode = 'ra'
@@ -445,6 +415,20 @@ let g:wildfire_objects = {
 let g:airline_theme = 'base16'
 let g:airline_left_sep='›'  " Slightly fancier than '>'
 let g:airline_right_sep='‹' " Slightly fancier than '<'
+
+
+" Plugins: vim-go
+" https://github.com/fatih/vim-go/issues/129
+source ~/.vim/plugged/vim-go/syntax/godoc.vim
+" todo: mapping for go filetype:
+" au FileType go nmap <Leader>i <Plug>(go-info)
+" au FileType go nmap <Leader>od <Plug>(go-doc-browser)
+" etc.
+
+" Plugins: yankstack
+nmap <ALT+p> <Plug>yankstack_substitute_older_paste
+nmap <ALT+P> <Plug>yankstack_substitute_newer_paste
+let g:yankstack_yank_keys = ['y', 'd', 'c']
 
 
 " GUI Settings
