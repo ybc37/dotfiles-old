@@ -5,28 +5,23 @@ set shell=/bin/bash\ -i
 call plug#begin('~/.vim/plugged')
 
 Plug 'justinmk/vim-sneak'
-Plug 'chriskempson/base16-vim'
 Plug 'jaxbot/browserlink.vim'
 Plug 'Raimondi/delimitMate'
 Plug 'bling/vim-airline'
-Plug 'bling/vim-bufferline'
 Plug 'mileszs/ack.vim'
 Plug 'scrooloose/nerdtree'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'kien/ctrlp.vim'
 Plug 'tacahiroy/ctrlp-funky'
-Plug 'terryma/vim-multiple-cursors'
 Plug 'vim-scripts/sessionman.vim'
 Plug 'matchit.zip'
 Plug 'Lokaltog/vim-easymotion'
 Plug 'mbbill/undotree'
-Plug 'nathanaelkane/vim-indent-guides'
 Plug 'gcmt/wildfire.vim'
 Plug 'scrooloose/syntastic'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-commentary'
-Plug 'godlygeek/tabular'
 Plug 'majutsushi/tagbar'
 Plug 'Valloric/YouCompleteMe'
 Plug 'SirVer/ultisnips'
@@ -36,13 +31,21 @@ Plug 'groenewege/vim-less'
 Plug 'pangloss/vim-javascript'
 Plug 'amirh/HTML-AutoCloseTag'
 Plug 'hail2u/vim-css3-syntax'
-Plug 'gorodinskiy/vim-coloresque'
 Plug 'tpope/vim-haml'
 Plug 'fatih/vim-go'
 Plug 'tpope/vim-markdown'
 Plug 'vim-scripts/restore_view.vim'
 Plug 'mhinz/vim-signify'
 Plug 'maxbrunsfeld/vim-yankstack'
+
+" kalisi
+Plug 'freeo/vim-kalisi'
+Plug 'Yggdroot/indentLine'
+
+Plug 'othree/javascript-libraries-syntax.vim'
+Plug 'burnettk/vim-angular'
+
+Plug 'https://github.com/vasconcelloslf/vim-interestingwords'
 
 call plug#end()
 
@@ -57,7 +60,8 @@ scriptencoding utf-8
 set nospell
 set clipboard=
 
-autocmd FileType c,cpp,cs,java,go setlocal commentstring=//\ %s
+autocmd FileType c,cpp,cs,java,go,php setlocal commentstring=//\ %s
+autocmd FileType sql setlocal commentstring=--\ %s
 
 set viewoptions=folds,options,cursor,unix,slash " Better Unix / Windows compatibility
 set virtualedit=onemore                         " Allow for cursor beyond last character
@@ -82,8 +86,13 @@ set undodir=~/.vimundo
 
 
 " Vim UI
-set guifont=Inconsolata\ 11
-colorscheme base16-default
+" kalisi
+set t_Co=256
+" set guifont=Inconsolata\ 11
+set guifont=Inconsolata-dz\ for\ Powerline\ 9
+
+" colorscheme base16-default
+colorscheme kalisi
 set background=dark                            " Assume a dark background
 
 set visualbell                                 " kein beep...
@@ -125,7 +134,8 @@ set splitright    " Puts new vsplit windows to the right of the current
 set splitbelow    " Puts new split windows to the bottom of the current
 set textwidth=120
 set formatoptions-=t
-
+" toggle wrapping of long lines
+nmap <F10> :set wrap! linebreak!<CR>
 
 " Key Mappings
 
@@ -226,10 +236,8 @@ map zh zH
 
 let b:match_ignorecase = 1
 let g:syntastic_always_populate_loc_list = 1
-nnoremap <leader>a :Ack 
+nnoremap <leader>a :Ack!
 let g:ackprg = '/bin/ag -S --nogroup --nocolor --column'
-" bufferline nicht noch separat von airline darstellen
-let g:bufferline_echo = 0
 
 
 " Plugins: OmniComplete
@@ -268,14 +276,12 @@ endif
 
 " Make it so AutoCloseTag works for xml and xhtml files as well
 au FileType xhtml,xml ru ftplugin/html/autoclosetag.vim
-nmap <Leader>ac <Plug>ToggleAutoCloseMappings
 
 
 " Plugins: NerdTree
 
 map <C-e> <plug>NERDTreeTabsToggle<CR>
 map <leader>e :NERDTreeFind<CR>
-nmap <leader>nt :NERDTreeFind<CR>
 
 let NERDTreeShowBookmarks=1
 let NERDTreeIgnore=['\.py[cd]$', '\~$', '\.swo$', '\.swp$', '^\.git$', '^\.hg$', '^\.svn$', '\.bzr$']
@@ -366,6 +372,7 @@ let g:acp_enableAtStartup = 0
 
 let g:ycm_complete_in_comments = 1
 let g:ycm_complete_in_strings = 1
+let g:ycm_collect_identifiers_from_comments_and_strings = 1
 
 " enable completion from tags
 let g:ycm_collect_identifiers_from_tags_files = 1
@@ -399,9 +406,9 @@ let g:undotree_SetFocusWhenToggle=1
 
 
 " Plugins: indent_guides
-let g:indent_guides_start_level = 2
-let g:indent_guides_guide_size = 1
-let g:indent_guides_enable_on_vim_startup = 1
+" let g:indent_guides_start_level = 2
+" let g:indent_guides_guide_size = 1
+" let g:indent_guides_enable_on_vim_startup = 1
 
 
 " Plugins: Wildfire
@@ -412,18 +419,28 @@ let g:wildfire_objects = {
 
 
 " Plugins: vim-airline
-let g:airline_theme = 'base16'
-let g:airline_left_sep='›'  " Slightly fancier than '>'
-let g:airline_right_sep='‹' " Slightly fancier than '<'
+" let g:airline_theme = 'base16'
+" kalisi
+let g:airline_theme = 'kalisi'
+" let g:airline_left_sep='›'  " Slightly fancier than '>'
+" let g:airline_right_sep='‹' " Slightly fancier than '<'
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#show_close_button = 0
+" let g:airline#extensions#tabline#left_sep = '›'
+" let g:airline#extensions#tabline#left_alt_sep = '›'
+let g:airline#extensions#tabline#fnamemod = ':t'
+let g:airline_powerline_fonts = 1
 
 
 " Plugins: vim-go
 " https://github.com/fatih/vim-go/issues/129
-source ~/.vim/plugged/vim-go/syntax/godoc.vim
+source ~/.vim/plugged/vim-go/autoload/go/doc.vim
 " todo: mapping for go filetype:
 " au FileType go nmap <Leader>i <Plug>(go-info)
 " au FileType go nmap <Leader>od <Plug>(go-doc-browser)
 " etc.
+let g:go_fmt_fail_silently = 1
+
 
 " Plugins: yankstack
 nmap <ALT+p> <Plug>yankstack_substitute_older_paste
@@ -431,11 +448,15 @@ nmap <ALT+P> <Plug>yankstack_substitute_newer_paste
 let g:yankstack_yank_keys = ['y', 'd', 'c']
 
 
+" Plugins: vim-interestingwords
+" nnoremap <silent> <leader>n :call WordNavigation('forward')<cr>
+" nnoremap <silent> <leader>N :call WordNavigation('backward')<cr>
+
 " GUI Settings
 
 " GVIM- (here instead of .gvimrc)
 if has('gui_running')
-    set guioptions-=T         " Remove the toolbar
-    set lines=999 columns=999 " //Maximize// gvim window.
+    set guioptions-=m         " Remove menu bar
+    set guioptions-=T         " Remove toolbar
+    " set lines=999 columns=999 " //Maximize// gvim window. -> kde window/application rules
 endif
-

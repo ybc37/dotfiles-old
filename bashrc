@@ -19,8 +19,12 @@ bind 'set completion-ignore-case on'
 set -o vi
 complete -cf sudo
 
+bind 'set show-all-if-ambiguous on'
+
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
+bind '"\ep": history-search-backward'
+bind '"\en": history-search-forward'
 
 # ls
 alias ls='ls -hF --color=auto'
@@ -34,17 +38,19 @@ alias lm='la | more'
 
 o() { [ -z "$@" ] && command kde-open . || command kde-open "$@" ; }
 
-alias ag='ag -S --pager="less -XFR" --stats'
+# alias ag='ag -S --pager="less -XFR" --stats'
+alias ag='ag -S --pager="less -XFR"'
 
 #http://stackoverflow.com/questions/7381039/how-can-i-remove-the-default-empty-buffer-from-vim
 g() { [ -z "$(command gvim --serverlist)" ] && command gvim "$@" || command gvim --remote-silent "$@" ; }
 
-alias gg='g .'
-
 f() { find -iname "*$1*"; }
+
+alias pwds='pwd | head -c -1 | xsel -i'
+alias pwdc='pwd | head -c -1 | xsel -i -b'
+
+alias a=atom
 
 export GOPATH=~/go
 export PATH="$PATH:$GOPATH/bin"
-
 export PATH="$PATH:$HOME/bin"
-
